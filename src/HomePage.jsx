@@ -1,23 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 const HomePage = ({ todos = [], setTodos }) => {
-  const [newTodo, setNewTodo] = useState('');
-  const navigate = useNavigate();
-
-  const handleAddTodo = () => {
-    if (newTodo.trim() === '') return;
-    const newId = todos.length > 0 ? Math.max(...todos.map(todo => todo.id)) + 1 : 1;
-    const todoItem = {
-      id: newId,
-      todo: newTodo,
-      completed: false,
-      userId: 1,
-    };
-    setTodos([todoItem, ...todos]);
-    setNewTodo('');
-  };
-
   const handleToggleComplete = (id) => {
     setTodos(todos.map(todo =>
       todo.id === id ? { ...todo, completed: !todo.completed } : todo
@@ -28,53 +11,40 @@ const HomePage = ({ todos = [], setTodos }) => {
     setTodos(todos.filter(todo => todo.id !== id));
   };
 
-  const today = new Date().toLocaleDateString(undefined, {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
+  const today = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const formattedDate = today.toLocaleDateString(undefined, options);
 
   const completedTodos = todos.filter(todo => todo.completed);
   const incompleteTodos = todos.filter(todo => !todo.completed);
 
   return (
-    <div style={styles.page}>
+    <div style={styles.container}>
       <header style={styles.header}>
-        <h1 style={styles.title}>📝 My Todo List</h1>
-        <p style={styles.date}>{today}</p>
-        <div style={styles.addSection}>
-          <input
-            type="text"
-            value={newTodo}
-            placeholder="Add a new task..."
-            onChange={(e) => setNewTodo(e.target.value)}
-            style={styles.input}
-          />
-          <button onClick={handleAddTodo} style={styles.button}>Add</button>
-        </div>
+        <h1 style={styles.appTitle}>My To-Do List</h1>
+        <p style={styles.date}>{formattedDate}</p>
       </header>
 
-      <main>
+      <div style={styles.taskListContainer}>
         {todos.length === 0 ? (
-          <p style={styles.empty}>No tasks. Add something!</p>
+          <p style={styles.emptyState}>You're all caught up! Time to relax or add new tasks.</p>
         ) : (
           <>
             {incompleteTodos.length > 0 && (
               <>
-                <h2 style={styles.sectionTitle}>Pending</h2>
+                <h2 style={styles.sectionTitle}>Things To Do</h2>
                 {incompleteTodos.map(todo => (
-                  <div key={todo.id} style={styles.todoCard}>
-                    <div style={styles.todoContent}>
-                      <p><strong>Description:</strong> {todo.todo}</p>
-                      <p><strong>Status:</strong> Not Completed</p>
-                      <p><strong>User ID:</strong> {todo.userId}</p>
-                    </div>
-                    <div style={styles.actions}>
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => handleToggleComplete(todo.id)}
-                      />
-                      <button onClick={() => handleDeleteTodo(todo.id)}>❌</button>
-                    </div>
+                  <div key={todo.id} style={styles.todoItem}>
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => handleToggleComplete(todo.id)}
+                      style={styles.checkbox}
+                    />
+                    <span style={styles.todoText}>{todo.todo}</span>
+                    <button onClick={() => handleDeleteTodo(todo.id)} style={styles.deleteButton}>
+                      &#x2715;
+                    </button>
                   </div>
                 ))}
               </>
@@ -82,111 +52,108 @@ const HomePage = ({ todos = [], setTodos }) => {
 
             {completedTodos.length > 0 && (
               <>
-                <h2 style={styles.sectionTitle}>Completed</h2>
+                <h2 style={styles.sectionTitle}>Completed Tasks ({completedTodos.length})</h2>
                 {completedTodos.map(todo => (
-                  <div key={todo.id} style={{ ...styles.todoCard, opacity: 0.7 }}>
-                    <div style={styles.todoContent}>
-                      <p><strong>Description:</strong> <s>{todo.todo}</s></p>
-                      <p><strong>Status:</strong> Completed</p>
-                      <p><strong>User ID:</strong> {todo.userId}</p>
-                    </div>
-                    <div style={styles.actions}>
-                      <input
-                        type="checkbox"
-                        checked={todo.completed}
-                        onChange={() => handleToggleComplete(todo.id)}
-                      />
-                      <button onClick={() => handleDeleteTodo(todo.id)}>❌</button>
-                    </div>
+                  <div key={todo.id} style={{ ...styles.todoItem, ...styles.completedTodoItem }}>
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => handleToggleComplete(todo.id)}
+                      style={styles.checkbox}
+                    />
+                    <span style={{ ...styles.todoText, textDecoration: 'line-through', color: '#999' }}>
+                      {todo.todo}
+                    </span>
+                    <button onClick={() => handleDeleteTodo(todo.id)} style={styles.deleteButton}>
+                      &#x2715;
+                    </button>
                   </div>
                 ))}
               </>
             )}
           </>
         )}
-      </main>
+      </div>
     </div>
   );
 };
 
 const styles = {
-  page: {
+  container: {
+    fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+    maxWidth: '600px',
+    margin: '40px auto',
+    padding: '25px',
     backgroundColor: '#121212',
-    minHeight: '100vh',
-    padding: '30px',
-    color: '#f1f1f1',
-    fontFamily: 'Segoe UI, sans-serif',
+    borderRadius: '12px',
+    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.8)',
+    color: '#e0e0e0',
   },
   header: {
     textAlign: 'center',
-    marginBottom: '40px',
+    marginBottom: '30px',
+    paddingBottom: '15px',
+    borderBottom: '1px solid #333',
   },
-  title: {
-    fontSize: '2.5rem',
+  appTitle: {
+    fontSize: '2.5em',
     color: '#bb86fc',
+    margin: 0,
   },
   date: {
-    color: '#aaa',
-    marginBottom: '20px',
-  },
-  addSection: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-  },
-  input: {
-    padding: '10px 15px',
-    width: '300px',
-    borderRadius: '6px',
-    border: '1px solid #444',
-    backgroundColor: '#1e1e1e',
-    color: '#fff',
-    fontSize: '1rem',
-  },
-  button: {
-    padding: '10px 20px',
-    backgroundColor: '#bb86fc',
-    color: '#121212',
-    fontWeight: 'bold',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-  },
-  empty: {
-    textAlign: 'center',
-    fontStyle: 'italic',
+    fontSize: '1.1em',
     color: '#888',
+    marginTop: '5px',
+  },
+  taskListContainer: {
+    marginTop: '20px',
   },
   sectionTitle: {
-    marginTop: '30px',
-    fontSize: '1.5rem',
-    borderBottom: '1px solid #333',
-    paddingBottom: '10px',
+    fontSize: '1.8em',
+    color: '#bb86fc',
+    borderBottom: '1px solid #444',
+    paddingBottom: '8px',
+    marginBottom: '15px',
   },
-  todoCard: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    backgroundColor: '#1f1f1f',
-    padding: '15px',
-    marginTop: '15px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
-  },
-  todoContent: {
-    lineHeight: '1.6',
-  },
-  actions: {
+  todoItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    backgroundColor: '#1e1e1e',
+    marginBottom: '10px',
+    padding: '12px 15px',
+    borderRadius: '8px',
+  },
+  completedTodoItem: {
+    backgroundColor: '#2a2a2a',
+  },
+  checkbox: {
+    width: '20px',
+    height: '20px',
+    marginRight: '15px',
+    cursor: 'pointer',
+  },
+  todoText: {
+    flexGrow: 1,
+    fontSize: '1.1em',
+  },
+  deleteButton: {
+    background: 'transparent',
+    border: 'none',
+    color: '#ff6b6b',
+    fontSize: '1.3em',
+    cursor: 'pointer',
+    padding: '0 5px',
+    lineHeight: '1',
+  },
+  emptyState: {
+    textAlign: 'center',
+    fontSize: '1.3em',
+    color: '#999',
+    marginTop: '60px',
   },
 };
 
 export default HomePage;
-
-
-
-// import { useEffect, useState } from "react";
 
 // function HomePage() {
 //   const [todos, setTodos] = useState([]);

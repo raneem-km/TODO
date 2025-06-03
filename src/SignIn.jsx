@@ -8,14 +8,14 @@ const SignIn = ({ setUserId }) => {
   const handleSignIn = () => {
     if (!input.trim()) return;
     setUserId(parseInt(input));
-    navigate("/home");
+    navigate("/"); // redirect to landing page after sign in
   };
 
   return (
     <div style={styles.container}>
-      <h2>Enter User ID</h2>
+      <h1><b>Enter User ID </b></h1>
       <input
-        type="number"
+        type="number+string" 
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="User ID"

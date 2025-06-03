@@ -1,5 +1,3 @@
-
-import { orange } from '@mui/material/colors';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,17 +20,19 @@ const AddTodo = ({ setTodos, userId }) => {
 
   return (
     <div style={styles.page}>
-      <h2>Add New Task</h2>
+      <h1 style={styles.appTitle}>Add New Task 📝</h1>
       <input
         type="text"
-        placeholder="Task description"
+        placeholder="Add a new task..."
         value={desc}
         onChange={(e) => setDesc(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
         style={styles.input}
       />
-     <button onClick={handleAdd} style={styles.button} color="orange">Add</button>
-
-
+      <br />
+      <button onClick={handleAdd} style={styles.button}>
+        Add Task
+      </button>
     </div>
   );
 };
@@ -43,7 +43,7 @@ const styles = {
     color: '#fff',
     padding: '50px',
     minHeight: '100vh',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   input: {
     padding: '10px',
@@ -64,7 +64,12 @@ const styles = {
     fontWeight: 'bold',
     borderRadius: '6px',
     cursor: 'pointer',
-  }
+  },
+  appTitle: {
+    fontSize: '2em',
+    marginBottom: '20px',
+    color: '#bb86fc',
+  },
 };
 
 export default AddTodo;

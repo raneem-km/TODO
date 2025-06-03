@@ -1,4 +1,5 @@
 
+
 import { Link } from 'react-router-dom';
 
 const navStyle = {
@@ -21,17 +22,20 @@ const linkStyle = {
 const Navbar = ({ userId }) => {
   return (
     <nav style={navStyle}>
-      <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Todo Dark</div>
+      <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+        <b> <h1>  To-Do  🎯</h1> </b>
+      </div>
       <div>
-        {userId && (
+        {userId ? (
           <>
+            <Link to="/" style={linkStyle}></Link>
             <Link to="/home" style={linkStyle}>Home</Link>
-            <Link to="/add" style={linkStyle}>Add Todo</Link>
+            <Link to="/add" style={linkStyle}>Add Task</Link>
           </>
+        ) : (
+          <Link to="/signin" style={linkStyle}>Sign In</Link>
         )}
-        {!userId && <Link to="/" style={linkStyle}>Sign In</Link>}
-    
-          </div>
+      </div>
     </nav>
   );
 };
